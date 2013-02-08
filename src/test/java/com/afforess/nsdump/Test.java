@@ -24,14 +24,21 @@ package com.afforess.nsdump;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 public class Test {
 
 	public static void main(String[] args) throws IOException, SQLException {
+		testRegionDump();
+	}
+
+	public static void testRegionDump() throws IOException, SQLException {
 		RegionsDump dump = new RegionsDump();
 		dump.parse();
 		
@@ -52,4 +59,37 @@ public class Test {
 		db.delete();
 	}
 
+	public static void testNationDump() throws IOException, SQLException {
+		NationsDump dump = new NationsDump();
+		dump.parse();
+				
+		Connection conn = dump.getDatabaseConnection();
+		PreparedStatement statement = conn.prepareStatement("SELECT (name) FROM nations");
+		ResultSet result = statement.executeQuery();
+		int total = 0;
+		while(result.next()) {
+			total++;
+		}
+		result.close();
+		
+		System.out.println("Total nations: " + total);
+		
+		statement = conn.prepareStatement("SELECT * FROM nations WHERE name = 'sakhovelo'");
+		result = statement.executeQuery();
+		result.next();
+		for (int i = 1; i <= 10; i++) {
+			if (i == 4) {
+				Clob clob = result.getClob(i);
+				String motto = clob.getSubString(1, (int) clob.length());
+				String mottoEscaped = StringEscapeUtils.unescapeHtml(motto);
+				System.out.println("Raw: " + motto + " Escaped: " + mottoEscaped);
+			} else {
+				System.out.println(result.getString(i));
+			}
+		}
+		
+		
+		File db = new File("./ns-db.h2.db");
+		db.delete();
+	}
 }

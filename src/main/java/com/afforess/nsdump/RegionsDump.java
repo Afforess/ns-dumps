@@ -156,8 +156,8 @@ public class RegionsDump extends ArchiveDump {
 	private static class RegionParser extends DefaultHandler {
 		private final Connection conn;
 		//Element data
-		private char[] chars;
-		private int start, length;
+		private final StringBuilder builder = new StringBuilder();
+		private boolean reset = true;
 
 		//Region Data
 		private String name;
@@ -180,20 +180,22 @@ public class RegionsDump extends ArchiveDump {
 			if (elementName.equalsIgnoreCase("embassies")) {
 				embassies.clear();
 			}
+			reset = true;
 		}
 
 		@Override
 		public void endElement(String s, String s1, String element) throws SAXException {
+			reset = true;
 			if (element.equalsIgnoreCase("region")) {
 				try {
 					PreparedStatement statement = conn.prepareStatement("INSERT INTO regions (name, factbook, numnations, nations, " +
 							"delegate, delegatevotes, founder, power, flag, embassies)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 					statement.setString(1, name.toLowerCase().replaceAll(" ", "_"));
 					statement.setClob(2, new StringReader(factbook));
-					statement.setInt(3, parseInt(numNations, 0));
+					statement.setInt(3, Integer.parseInt(numNations));
 					statement.setClob(4, new StringReader(nations));
 					statement.setString(5, delegate);
-					statement.setInt(6, parseInt(delegateVotes, 0));
+					statement.setInt(6, Integer.parseInt(delegateVotes));
 					statement.setString(7, founder);
 					statement.setString(8, power);
 					statement.setString(9, flag);
@@ -213,40 +215,36 @@ public class RegionsDump extends ArchiveDump {
 					throw new RuntimeException(e);
 				}
 			} else if (element.equalsIgnoreCase("name")) {
-				name = String.valueOf(chars, start, length);
+				name = builder.toString();
 			} else if (element.equalsIgnoreCase("factbook")) {
-				factbook = String.valueOf(chars, start, length);
+				factbook = builder.toString();
 			} else if (element.equalsIgnoreCase("numnations")) {
-				numNations = String.valueOf(chars, start, length);
+				numNations = builder.toString();
 			} else if (element.equalsIgnoreCase("nations")) {
-				nations = String.valueOf(chars, start, length);
+				nations = builder.toString();
 			} else if (element.equalsIgnoreCase("delegate")) {
-				delegate = String.valueOf(chars, start, length);
+				delegate = builder.toString();
 			} else if (element.equalsIgnoreCase("delegatevotes")) {
-				delegateVotes = String.valueOf(chars, start, length);
+				delegateVotes = builder.toString();
 			} else if (element.equalsIgnoreCase("founder")) {
-				founder = String.valueOf(chars, start, length);
+				founder = builder.toString();
 			} else if (element.equalsIgnoreCase("power")) {
-				power = String.valueOf(chars, start, length);
+				power = builder.toString();
 			} else if (element.equalsIgnoreCase("flag")) {
-				flag = String.valueOf(chars, start, length);
+				flag = builder.toString();
 			} else if (element.equalsIgnoreCase("embassy")) {
-				embassies.add(String.valueOf(chars, start, length));
+				embassies.add(builder.toString());
 			} 
 		}
 
 		@Override
 		public void characters(char[] ac, int i, int j) throws SAXException {
-			chars = ac;
-			start = i;
-			length = j;
-		}
-
-		private int parseInt(String value, int def) {
-			try {
-				return Integer.parseInt(value);
-			} catch (NumberFormatException e) {
-				return def;
+			if (reset) {
+				builder.delete(0, builder.length());
+				builder.append(ac, i, j);
+				reset = false;
+			} else {
+				builder.append(ac, i, j);
 			}
 		}
 	}
