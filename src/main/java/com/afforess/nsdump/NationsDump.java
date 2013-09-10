@@ -22,6 +22,7 @@
  */
 package com.afforess.nsdump;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -153,7 +154,7 @@ public class NationsDump extends ArchiveDump {
 
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser parser = factory.newSAXParser();
-			parser.parse(new GZIPInputStream(stream), new NationsParser(conn));
+			parser.parse(new BufferedInputStream(new GZIPInputStream(stream)), new NationsParser(conn));
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception", e);
 		} catch (SAXException e) {
