@@ -152,6 +152,7 @@ public class NationsDump extends ArchiveDump {
 					"lastlogin bigint, lastactivity varchar(255), influence varchar(50), civilrightscore int, economyscore int, polticialfreedomscore int," +
 					"publicsector int, leader varchar(50), capital varchar(50), religion varchar(50))").execute();
 
+			conn.prepareStatement("CREATE INDEX nation_name ON nations(name);").execute();
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser parser = factory.newSAXParser();
 			parser.parse(new BufferedInputStream(new GZIPInputStream(stream)), new NationsParser(conn));

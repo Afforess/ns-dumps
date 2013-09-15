@@ -116,6 +116,7 @@ public class RegionsDump extends ArchiveDump {
 			conn.prepareStatement("CREATE TABLE regions (name varchar(50), factbook clob, numnations int, nations clob," +
 					"delegate varchar(50), delegatevotes int, founder varchar(50), power varchar(50), flag varchar(255), embassies clob)").execute();
 
+			conn.prepareStatement("CREATE INDEX region_name ON regions(name);").execute();
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser parser = factory.newSAXParser();
 			parser.parse(new GZIPInputStream(stream), new RegionParser(conn));
