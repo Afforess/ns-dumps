@@ -51,6 +51,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  * <p><b>regions table format</b><pre>
  * <span style="padding: 0 10px">&nbsp;</span>name                       - varchar
+ * <span style="padding: 0 10px">&nbsp;</span>title                      - varchar
  * <span style="padding: 0 10px">&nbsp;</span>type                       - varchar
  * <span style="padding: 0 10px">&nbsp;</span>fullname                   - varchar
  * <span style="padding: 0 10px">&nbsp;</span>motto                      - clob
@@ -144,7 +145,7 @@ public class NationsDump extends ArchiveDump {
 			try {
 				conn.prepareStatement("DROP TABLE nations").execute();
 			} catch (SQLException ignore) {	}
-			conn.prepareStatement("CREATE TABLE nations (name varchar(50), type varchar(255), fullname varchar(255), motto clob," +
+			conn.prepareStatement("CREATE TABLE nations (name varchar(50), title varchar(50), type varchar(255), fullname varchar(255), motto clob," +
 					"category varchar(255), unstatus varchar(15), civilrights varchar(25), economy varchar(25), politicalfreedom varchar(25), " +
 					"region varchar(50), population int, tax int, animal varchar(255), currency varchar(255), flag varchar(255), majorindustry varchar(50)," +
 					"governmentpriority varchar(50), environment int, socialequality int, education int, lawandorder int, administration int," +
@@ -199,7 +200,7 @@ public class NationsDump extends ArchiveDump {
 		//Region Data
 		private String name;
 		private String type;
-		private String fullName;
+		private String fullname;
 		private String motto;
 		private String category;
 		private String unstatus;
@@ -274,52 +275,53 @@ public class NationsDump extends ArchiveDump {
 			
 			if (element.equalsIgnoreCase("nation")) {
 				try {
-					PreparedStatement statement = conn.prepareStatement("INSERT INTO nations (name, type, fullname, motto," +
+					PreparedStatement statement = conn.prepareStatement("INSERT INTO nations (name, title, type, fullname, motto," +
 					"category, unstatus, civilrights, economy, politicalfreedom, region, population, tax, animal, currency," +
 					" flag, majorindustry, governmentpriority, environment, socialequality, education, lawandorder, administration," +
 					" welfare, spirituality, defence, publictransport, healthcare, commerce, founded, firstlogin, lastlogin," +
 					" lastactivity, influence, civilrightscore, economyscore, polticialfreedomscore, publicsector, leader, capital," +
-					" religion)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+					" religion)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 					statement.setString(1, name.toLowerCase().replaceAll(" ", "_"));
-					statement.setString(2, type);
-					statement.setString(3, fullName);
-					statement.setClob(4, new StringReader(motto));
-					statement.setString(5, category);
-					statement.setString(6, unstatus);
-					statement.setString(7, civilRights);
-					statement.setString(8, economy);
-					statement.setString(9, politicalFreedom);
-					statement.setString(10, region);
-					statement.setInt(11, Integer.parseInt(population));
-					statement.setInt(12, Integer.parseInt(tax));
-					statement.setString(13, animal);
-					statement.setString(14, currency);
-					statement.setString(15, flag);
-					statement.setString(16, majorIndustry);
-					statement.setString(17, govtPriority);
-					statement.setInt(18, Integer.parseInt(slc(environment)));
-					statement.setInt(19, Integer.parseInt(slc(socialEquality)));
-					statement.setInt(20, Integer.parseInt(slc(education)));
-					statement.setInt(21, Integer.parseInt(slc(lawAndOrder)));
-					statement.setInt(22, Integer.parseInt(slc(administration)));
-					statement.setInt(23, Integer.parseInt(slc(welfare)));
-					statement.setInt(24, Integer.parseInt(slc(spirituality)));
-					statement.setInt(25, Integer.parseInt(slc(defence)));
-					statement.setInt(26, Integer.parseInt(slc(publicTransport)));
-					statement.setInt(27, Integer.parseInt(slc(healthCare)));
-					statement.setInt(28, Integer.parseInt(slc(commerce)));
-					statement.setString(29, founded);
-					statement.setLong(30, Long.parseLong(firstLogin));
-					statement.setLong(31, Long.parseLong(lastLogin));
-					statement.setString(32, lastActivity);
-					statement.setString(33, influence);
-					statement.setInt(34, Integer.parseInt(civilRightsScore));
-					statement.setInt(35, Integer.parseInt(economyScore));
-					statement.setInt(36, Integer.parseInt(politicalFreedomScore));
-					statement.setInt(37, Integer.parseInt(slc(publicSector)));
-					statement.setString(38, leader);
-					statement.setString(39, capital);
-					statement.setString(40, religion);
+					statement.setString(2, name);
+					statement.setString(3, type);
+					statement.setString(4, fullname);
+					statement.setClob(5, new StringReader(motto));
+					statement.setString(6, category);
+					statement.setString(7, unstatus);
+					statement.setString(8, civilRights);
+					statement.setString(9, economy);
+					statement.setString(10, politicalFreedom);
+					statement.setString(11, region);
+					statement.setInt(12, Integer.parseInt(population));
+					statement.setInt(13, Integer.parseInt(tax));
+					statement.setString(14, animal);
+					statement.setString(15, currency);
+					statement.setString(16, flag);
+					statement.setString(17, majorIndustry);
+					statement.setString(18, govtPriority);
+					statement.setInt(19, Integer.parseInt(slc(environment)));
+					statement.setInt(20, Integer.parseInt(slc(socialEquality)));
+					statement.setInt(21, Integer.parseInt(slc(education)));
+					statement.setInt(22, Integer.parseInt(slc(lawAndOrder)));
+					statement.setInt(23, Integer.parseInt(slc(administration)));
+					statement.setInt(24, Integer.parseInt(slc(welfare)));
+					statement.setInt(25, Integer.parseInt(slc(spirituality)));
+					statement.setInt(26, Integer.parseInt(slc(defence)));
+					statement.setInt(27, Integer.parseInt(slc(publicTransport)));
+					statement.setInt(28, Integer.parseInt(slc(healthCare)));
+					statement.setInt(29, Integer.parseInt(slc(commerce)));
+					statement.setString(30, founded);
+					statement.setLong(31, Long.parseLong(firstLogin));
+					statement.setLong(32, Long.parseLong(lastLogin));
+					statement.setString(33, lastActivity);
+					statement.setString(34, influence);
+					statement.setInt(35, Integer.parseInt(civilRightsScore));
+					statement.setInt(36, Integer.parseInt(economyScore));
+					statement.setInt(37, Integer.parseInt(politicalFreedomScore));
+					statement.setInt(38, Integer.parseInt(slc(publicSector)));
+					statement.setString(39, leader);
+					statement.setString(40, capital);
+					statement.setString(41, religion);
 					statement.execute();
 				}  catch (NumberFormatException e) {
 					throw new RuntimeException(e);

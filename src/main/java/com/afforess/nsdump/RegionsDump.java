@@ -50,6 +50,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * 
  * <p><b>regions table format</b><pre>
  * <span style="padding: 0 10px">&nbsp;</span>name           - varchar
+ * <span style="padding: 0 10px">&nbsp;</span>title          - varchar
  * <span style="padding: 0 10px">&nbsp;</span>factbook       - clob
  * <span style="padding: 0 10px">&nbsp;</span>numnations     - int
  * <span style="padding: 0 10px">&nbsp;</span>nations        - clob
@@ -113,7 +114,7 @@ public class RegionsDump extends ArchiveDump {
 			try {
 				conn.prepareStatement("DROP TABLE regions").execute();
 			} catch (SQLException ignore) {	}
-			conn.prepareStatement("CREATE TABLE regions (name varchar(50), factbook clob, numnations int, nations clob," +
+			conn.prepareStatement("CREATE TABLE regions (name varchar(50), title varchar(50), factbook clob, numnations int, nations clob," +
 					"delegate varchar(50), delegatevotes int, founder varchar(50), power varchar(50), flag varchar(255), embassies clob)").execute();
 
 			conn.prepareStatement("CREATE INDEX region_name ON regions(name);").execute();
@@ -189,17 +190,18 @@ public class RegionsDump extends ArchiveDump {
 			reset = true;
 			if (element.equalsIgnoreCase("region")) {
 				try {
-					PreparedStatement statement = conn.prepareStatement("INSERT INTO regions (name, factbook, numnations, nations, " +
-							"delegate, delegatevotes, founder, power, flag, embassies)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+					PreparedStatement statement = conn.prepareStatement("INSERT INTO regions (name, title, factbook, numnations, nations, " +
+							"delegate, delegatevotes, founder, power, flag, embassies)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 					statement.setString(1, name.toLowerCase().replaceAll(" ", "_"));
-					statement.setClob(2, new StringReader(factbook));
-					statement.setInt(3, Integer.parseInt(numNations));
-					statement.setClob(4, new StringReader(nations));
-					statement.setString(5, delegate);
-					statement.setInt(6, Integer.parseInt(delegateVotes));
-					statement.setString(7, founder);
-					statement.setString(8, power);
-					statement.setString(9, flag);
+					statement.setString(2, name);
+					statement.setClob(3, new StringReader(factbook));
+					statement.setInt(4, Integer.parseInt(numNations));
+					statement.setClob(5, new StringReader(nations));
+					statement.setString(6, delegate);
+					statement.setInt(7, Integer.parseInt(delegateVotes));
+					statement.setString(8, founder);
+					statement.setString(9, power);
+					statement.setString(10, flag);
 					if (embassies.size() > 0) {
 						StringBuilder builder = new StringBuilder();
 						for (String embassy : embassies) {
@@ -207,9 +209,9 @@ public class RegionsDump extends ArchiveDump {
 							builder.append(":");
 						}
 						builder.deleteCharAt(builder.length() - 1);
-						statement.setClob(10, new StringReader(builder.toString()));
+						statement.setClob(11, new StringReader(builder.toString()));
 					} else {
-						statement.setClob(10, new StringReader(""));
+						statement.setClob(11, new StringReader(""));
 					}
 					statement.execute();
 				} catch (SQLException e) {
