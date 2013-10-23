@@ -35,7 +35,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 public class Test {
 
 	public static void main(String[] args) throws IOException, SQLException {
-		testRegionDump();
+		testNationDump();
 	}
 
 	public static void testRegionDump() throws IOException, SQLException {

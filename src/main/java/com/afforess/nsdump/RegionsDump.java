@@ -22,6 +22,7 @@
  */
 package com.afforess.nsdump;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -35,6 +36,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -42,7 +45,11 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.Attributes;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -66,6 +73,7 @@ public class RegionsDump extends ArchiveDump {
 	private final static String REGIONS_DUMP_URL = "http://www.nationstates.net/pages/regions.xml.gz";
 	private final InputStream stream;
 	private boolean parsed;
+	private final List<SAXParseException> exceptions = new ArrayList<SAXParseException>();
 	/**
 	 * Constructs a region dump using the given file as the data source
 	 * @param file regions.xml.gz file
@@ -104,6 +112,15 @@ public class RegionsDump extends ArchiveDump {
 	}
 
 	/**
+	 * Gets any exceptions that occurred during the parsing
+	 * 
+	 * @return exceptions
+	 */
+	public List<SAXParseException> getExceptions() {
+		return Collections.unmodifiableList(exceptions);
+	}
+
+	/**
 	 * Parses the region data into the database
 	 */
 	public void parse() {
@@ -120,7 +137,11 @@ public class RegionsDump extends ArchiveDump {
 			conn.prepareStatement("CREATE INDEX region_name ON regions(name);").execute();
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser parser = factory.newSAXParser();
-			parser.parse(new GZIPInputStream(stream), new RegionParser(conn));
+			XMLReader reader = parser.getXMLReader();
+			reader.setErrorHandler(new SaxErrorHandler());
+			reader.setContentHandler(new RegionParser(conn));
+			reader.setFeature("http://apache.org/xml/features/continue-after-fatal-error", true);
+			reader.parse(new InputSource(new BufferedInputStream(new GZIPInputStream(stream))));
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception", e);
 		} catch (SAXException e) {
@@ -136,6 +157,20 @@ public class RegionsDump extends ArchiveDump {
 					conn.close();
 				} catch (SQLException e) { }
 			}
+		}
+	}
+
+	private class SaxErrorHandler implements ErrorHandler {
+		public void warning(SAXParseException exception) {
+			exceptions.add(exception);
+		}
+
+		public void error(SAXParseException exception) {
+			exceptions.add(exception);
+		}
+
+		public void fatalError(SAXParseException exception) {
+			exceptions.add(exception);
 		}
 	}
 

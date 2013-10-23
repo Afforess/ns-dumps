@@ -36,6 +36,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -43,7 +46,11 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.Attributes;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -97,6 +104,7 @@ public class NationsDump extends ArchiveDump {
 	private final static String NATIONS_DUMP_URL = "http://www.nationstates.net/pages/nations.xml.gz";
 	private final InputStream stream;
 	private boolean parsed;
+	private List<SAXParseException> exceptions = new ArrayList<SAXParseException>();
 	/**
 	 * Constructs a nation dump using the given file as the data source
 	 * @param file nation.xml.gz file
@@ -135,6 +143,15 @@ public class NationsDump extends ArchiveDump {
 	}
 
 	/**
+	 * Gets any exceptions that occurred during the parsing
+	 * 
+	 * @return exceptions
+	 */
+	public List<SAXParseException> getExceptions() {
+		return Collections.unmodifiableList(exceptions);
+	}
+
+	/**
 	 * Parses the nation data into the database
 	 */
 	public void parse() {
@@ -156,7 +173,11 @@ public class NationsDump extends ArchiveDump {
 			conn.prepareStatement("CREATE INDEX nation_name ON nations(name);").execute();
 			SAXParserFactory factory = SAXParserFactory.newInstance();
 			SAXParser parser = factory.newSAXParser();
-			parser.parse(new BufferedInputStream(new GZIPInputStream(stream)), new NationsParser(conn));
+			XMLReader reader = parser.getXMLReader();
+			reader.setErrorHandler(new SaxErrorHandler());
+			reader.setContentHandler(new NationsParser(conn));
+			reader.setFeature("http://apache.org/xml/features/continue-after-fatal-error", true);
+			reader.parse(new InputSource(new BufferedInputStream(new GZIPInputStream(stream))));
 		} catch (SQLException e) {
 			throw new RuntimeException("SQL Exception", e);
 		} catch (SAXException e) {
@@ -172,6 +193,20 @@ public class NationsDump extends ArchiveDump {
 					conn.close();
 				} catch (SQLException e) { }
 			}
+		}
+	}
+
+	private class SaxErrorHandler implements ErrorHandler {
+		public void warning(SAXParseException exception) {
+			exceptions.add(exception);
+		}
+
+		public void error(SAXParseException exception) {
+			exceptions.add(exception);
+		}
+
+		public void fatalError(SAXParseException exception) {
+			exceptions.add(exception);
 		}
 	}
 
