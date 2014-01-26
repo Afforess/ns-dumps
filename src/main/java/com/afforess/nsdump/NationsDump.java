@@ -104,7 +104,7 @@ public class NationsDump extends ArchiveDump {
 	private final static String NATIONS_DUMP_URL = "http://www.nationstates.net/pages/nations.xml.gz";
 	private final InputStream stream;
 	private boolean parsed;
-	private List<SAXParseException> exceptions = new ArrayList<SAXParseException>();
+	private final List<SAXParseException> exceptions = new ArrayList<SAXParseException>();
 	/**
 	 * Constructs a nation dump using the given file as the data source
 	 * @param file nation.xml.gz file
@@ -167,7 +167,7 @@ public class NationsDump extends ArchiveDump {
 					"region varchar(50), population int, tax int, animal varchar(255), currency varchar(255), flag varchar(255), majorindustry varchar(50)," +
 					"governmentpriority varchar(50), environment int, socialequality int, education int, lawandorder int, administration int," +
 					"welfare int, spirituality int, defence int, publictransport int, healthcare int, commerce int, founded varchar(255), firstlogin bigint," +
-					"lastlogin bigint, lastactivity varchar(255), influence varchar(50), civilrightscore int, economyscore int, polticialfreedomscore int," +
+					"lastlogin bigint, lastactivity varchar(255), influence varchar(50), civilrightscore int, economyscore int, politicalfreedomscore int," +
 					"publicsector int, leader varchar(50), capital varchar(50), religion varchar(50))").execute();
 
 			conn.prepareStatement("CREATE INDEX nation_name ON nations(name);").execute();
@@ -314,7 +314,7 @@ public class NationsDump extends ArchiveDump {
 					"category, unstatus, civilrights, economy, politicalfreedom, region, population, tax, animal, currency," +
 					" flag, majorindustry, governmentpriority, environment, socialequality, education, lawandorder, administration," +
 					" welfare, spirituality, defence, publictransport, healthcare, commerce, founded, firstlogin, lastlogin," +
-					" lastactivity, influence, civilrightscore, economyscore, polticialfreedomscore, publicsector, leader, capital," +
+					" lastactivity, influence, civilrightscore, economyscore, politicalfreedomscore, publicsector, leader, capital," +
 					" religion)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 					statement.setString(1, name.toLowerCase().replaceAll(" ", "_"));
 					statement.setString(2, name);
