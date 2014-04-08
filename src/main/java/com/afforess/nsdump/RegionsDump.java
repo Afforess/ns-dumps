@@ -67,6 +67,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * <span style="padding: 0 10px">&nbsp;</span>power          - varchar
  * <span style="padding: 0 10px">&nbsp;</span>flag           - varchar
  * <span style="padding: 0 10px">&nbsp;</span>embassies      - clob
+ * <span style="padding: 0 10px">&nbsp;</span>update_order   - int
  * </pre><p>
  */
 public class RegionsDump extends ArchiveDump {
@@ -132,7 +133,7 @@ public class RegionsDump extends ArchiveDump {
 				conn.prepareStatement("DROP TABLE regions").execute();
 			} catch (SQLException ignore) {	}
 			conn.prepareStatement("CREATE TABLE regions (name varchar(50), title varchar(50), factbook clob, numnations int, nations clob," +
-					"delegate varchar(50), delegatevotes int, founder varchar(50), power varchar(50), flag varchar(255), embassies clob)").execute();
+					"delegate varchar(50), delegatevotes int, founder varchar(50), power varchar(50), flag varchar(255), embassies clob, update_order int)").execute();
 
 			conn.prepareStatement("CREATE INDEX region_name ON regions(name);").execute();
 			SAXParserFactory factory = SAXParserFactory.newInstance();
@@ -195,6 +196,7 @@ public class RegionsDump extends ArchiveDump {
 		//Element data
 		private final StringBuilder builder = new StringBuilder();
 		private boolean reset = true;
+		private int regionCount = 0;
 
 		//Region Data
 		private String name;
@@ -207,6 +209,7 @@ public class RegionsDump extends ArchiveDump {
 		private String power;
 		private String flag;
 		private final ArrayList<String> embassies = new ArrayList<String>();
+		private boolean pendingEmbassy = false;
 
 		public RegionParser(Connection conn) {
 			this.conn = conn;
@@ -216,6 +219,10 @@ public class RegionsDump extends ArchiveDump {
 		public void startElement(String s, String s1, String elementName, Attributes attributes) throws SAXException {
 			if (elementName.equalsIgnoreCase("embassies")) {
 				embassies.clear();
+			} else if (elementName.equalsIgnoreCase("embassy")) {
+				if (attributes.getValue("type") != null) {
+					pendingEmbassy = true;
+				}
 			}
 			reset = true;
 		}
@@ -225,8 +232,9 @@ public class RegionsDump extends ArchiveDump {
 			reset = true;
 			if (element.equalsIgnoreCase("region")) {
 				try {
+					
 					PreparedStatement statement = conn.prepareStatement("INSERT INTO regions (name, title, factbook, numnations, nations, " +
-							"delegate, delegatevotes, founder, power, flag, embassies)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+							"delegate, delegatevotes, founder, power, flag, embassies, update_order)  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 					statement.setString(1, name.toLowerCase().replaceAll(" ", "_"));
 					statement.setString(2, name);
 					statement.setClob(3, new StringReader(factbook));
@@ -248,7 +256,9 @@ public class RegionsDump extends ArchiveDump {
 					} else {
 						statement.setClob(11, new StringReader(""));
 					}
+					statement.setInt(12, regionCount);
 					statement.execute();
+					regionCount++;
 				} catch (SQLException e) {
 					throw new RuntimeException(e);
 				}
@@ -271,7 +281,10 @@ public class RegionsDump extends ArchiveDump {
 			} else if (element.equalsIgnoreCase("flag")) {
 				flag = builder.toString();
 			} else if (element.equalsIgnoreCase("embassy")) {
-				embassies.add(builder.toString());
+				if (!pendingEmbassy)
+					embassies.add(builder.toString());
+				else
+					pendingEmbassy = false;
 			} 
 		}
 
