@@ -75,17 +75,17 @@ import org.xml.sax.helpers.DefaultHandler;
  * <span style="padding: 0 10px">&nbsp;</span>flag                       - varchar
  * <span style="padding: 0 10px">&nbsp;</span>majorindustry              - varchar
  * <span style="padding: 0 10px">&nbsp;</span>governmentpriority         - varchar
- * <span style="padding: 0 10px">&nbsp;</span>environment                - int
- * <span style="padding: 0 10px">&nbsp;</span>socialequality             - int
- * <span style="padding: 0 10px">&nbsp;</span>education                  - int
- * <span style="padding: 0 10px">&nbsp;</span>lawandorder                - int
- * <span style="padding: 0 10px">&nbsp;</span>administration             - int
- * <span style="padding: 0 10px">&nbsp;</span>welfare                    - int
- * <span style="padding: 0 10px">&nbsp;</span>spirituality               - int
- * <span style="padding: 0 10px">&nbsp;</span>defence                    - int
- * <span style="padding: 0 10px">&nbsp;</span>publictransport            - int
- * <span style="padding: 0 10px">&nbsp;</span>healthcare                 - int
- * <span style="padding: 0 10px">&nbsp;</span>commerce                   - int
+ * <span style="padding: 0 10px">&nbsp;</span>environment                - float
+ * <span style="padding: 0 10px">&nbsp;</span>socialequality             - float
+ * <span style="padding: 0 10px">&nbsp;</span>education                  - float
+ * <span style="padding: 0 10px">&nbsp;</span>lawandorder                - float
+ * <span style="padding: 0 10px">&nbsp;</span>administration             - float
+ * <span style="padding: 0 10px">&nbsp;</span>welfare                    - float
+ * <span style="padding: 0 10px">&nbsp;</span>spirituality               - float
+ * <span style="padding: 0 10px">&nbsp;</span>defence                    - float
+ * <span style="padding: 0 10px">&nbsp;</span>publictransport            - float
+ * <span style="padding: 0 10px">&nbsp;</span>healthcare                 - float
+ * <span style="padding: 0 10px">&nbsp;</span>commerce                   - float
  * <span style="padding: 0 10px">&nbsp;</span>founded                    - varchar
  * <span style="padding: 0 10px">&nbsp;</span>firstlogin                 - bigint
  * <span style="padding: 0 10px">&nbsp;</span>lastlogin                  - bigint
@@ -334,17 +334,17 @@ public class NationsDump extends ArchiveDump {
 					statement.setString(16, flag);
 					statement.setString(17, majorIndustry);
 					statement.setString(18, govtPriority);
-					statement.setInt(19, Integer.parseInt(slc(environment)));
-					statement.setInt(20, Integer.parseInt(slc(socialEquality)));
-					statement.setInt(21, Integer.parseInt(slc(education)));
-					statement.setInt(22, Integer.parseInt(slc(lawAndOrder)));
-					statement.setInt(23, Integer.parseInt(slc(administration)));
-					statement.setInt(24, Integer.parseInt(slc(welfare)));
-					statement.setInt(25, Integer.parseInt(slc(spirituality)));
-					statement.setInt(26, Integer.parseInt(slc(defence)));
-					statement.setInt(27, Integer.parseInt(slc(publicTransport)));
-					statement.setInt(28, Integer.parseInt(slc(healthCare)));
-					statement.setInt(29, Integer.parseInt(slc(commerce)));
+					statement.setFloat(19, Float.parseFloat(environment));
+					statement.setFloat(20, Float.parseFloat(socialEquality));
+					statement.setFloat(21, Float.parseFloat(education));
+					statement.setFloat(22, Float.parseFloat(lawAndOrder));
+					statement.setFloat(23, Float.parseFloat(administration));
+					statement.setFloat(24, Float.parseFloat(welfare));
+					statement.setFloat(25, Float.parseFloat(spirituality));
+					statement.setFloat(26, Float.parseFloat(defence));
+					statement.setFloat(27, Float.parseFloat(publicTransport));
+					statement.setFloat(28, Float.parseFloat(healthCare));
+					statement.setFloat(29, Float.parseFloat(commerce));
 					statement.setString(30, founded);
 					statement.setLong(31, Long.parseLong(firstLogin));
 					statement.setLong(32, Long.parseLong(lastLogin));
