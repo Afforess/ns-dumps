@@ -94,7 +94,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * <span style="padding: 0 10px">&nbsp;</span>civilrightscore            - int
  * <span style="padding: 0 10px">&nbsp;</span>economyscore               - int
  * <span style="padding: 0 10px">&nbsp;</span>politicalfreedomscore      - int
- * <span style="padding: 0 10px">&nbsp;</span>publicsector               - int
+ * <span style="padding: 0 10px">&nbsp;</span>publicsector               - float
  * <span style="padding: 0 10px">&nbsp;</span>leader                     - varchar
  * <span style="padding: 0 10px">&nbsp;</span>capital                    - varchar
  * <span style="padding: 0 10px">&nbsp;</span>religion                   - varchar
@@ -353,7 +353,7 @@ public class NationsDump extends ArchiveDump {
 					statement.setInt(35, Integer.parseInt(civilRightsScore));
 					statement.setInt(36, Integer.parseInt(economyScore));
 					statement.setInt(37, Integer.parseInt(politicalFreedomScore));
-					statement.setInt(38, Integer.parseInt(slc(publicSector)));
+					statement.setFloat(38, Float.parseFloat(publicSector));
 					statement.setString(39, leader);
 					statement.setString(40, capital);
 					statement.setString(41, religion);
@@ -409,18 +409,6 @@ public class NationsDump extends ArchiveDump {
 			} else {
 				builder.append(ac, i, j);
 			}
-		}
-
-		/**
-		 * Strips the last character of the string (used for removing % signs).
-		 * 
-		 * slc = strip last char
-		 * 
-		 * @param str
-		 * @return string
-		 */
-		private String slc(String str) {
-			return str.substring(0, str.length() - 1);
 		}
 	}
 }
